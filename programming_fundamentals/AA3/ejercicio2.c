@@ -9,27 +9,27 @@
 #define TIME_TO_SLEEP 0
 #define ASCII_FOUND_MARK 219	
 
-void inicializaMenosUno(int *array_to_fill) {
+void inicializaMenosUno(int entero, int *tabla) {
     int i = 0;
     while (i < ARRAY_SIZE) {
-        array_to_fill[i] = NUMBER_TO_FILL_WITH;
+        tabla[i] = NUMBER_TO_FILL_WITH;
         i++;
     }
 }
 
-void imprimeCarton(int array_to_print[ARRAY_SIZE]) {
+void imprimeCarton(int tabla[ARRAY_SIZE]) {
     int i = 0;
     
     printf("-------------------------------------------------\n");
     while (i < 100) {
         int line = 0;
         while (line < 10) {
-            if (array_to_print[i] == ASCII_FOUND_MARK)
-                printf("| %c ", array_to_print[i]);
-            else if (array_to_print[i] == -1)
+            if (tabla[i] == ASCII_FOUND_MARK)
+                printf("| %c ", tabla[i]);
+            else if (tabla[i] == -1)
                 printf("|   ");
             else
-                printf("| %d ", array_to_print[i]);
+                printf("| %d ", tabla[i]);
             line++;
             i++;
         }
@@ -38,34 +38,21 @@ void imprimeCarton(int array_to_print[ARRAY_SIZE]) {
     }
 }
 
-void generaCarton(int *array_to_fill) {
+void generaCarton(int *tabla) {
     int i = 0;
     while (i < ARRAY_SIZE / 5) {
-        int random_number = rand() % 4;
-        array_to_fill[random_number + (i * 5)] = random_number + (i * 5);
+        int entero = rand() % 4;
+        tabla[entero + (i * 5)] = entero + (i * 5);
         i++;
     }
 }
 
-int is_number_in_array(int *array_to_check, int number_to_check) {
-    if (number_to_check < ARRAY_SIZE) {
-        if (array_to_check[number_to_check] == number_to_check)
+int is_number_in_array(int *tabla, int entero) {
+    if (entero < ARRAY_SIZE) {
+        if (tabla[entero] == entero)
             return 1;
     }
     return 0;
-}
-
-void change_if_found(int *array_to_check, int number_to_check) {
-    if (is_number_in_array(array_to_check, number_to_check)) {
-        array_to_check[number_to_check] = ASCII_FOUND_MARK;
-    }
-}
-
-void generaNumerosAleatorios(int *game_array, int *random_number) {
-    *random_number = rand() % ARRAY_SIZE;
-    while (is_number_in_array(game_array, *random_number))
-        *random_number = rand() % ARRAY_SIZE;
-    game_array[*random_number] = *random_number;
 }
 
 void count_found(int *array_to_count, int *counter) {
@@ -77,27 +64,41 @@ void count_found(int *array_to_count, int *counter) {
     }
 }
 
-void gen_x_game_numbers(int game_array[], int x, int player1[], int player2[]) {
-    int random_number;
+
+
+void generaNumerosAleatorios(int *tabla, int *entero) {
+    *entero = rand() % ARRAY_SIZE;
+    while (is_number_in_array(tabla, *entero))
+        *entero = rand() % ARRAY_SIZE;
+    tabla[*entero] = *entero;
+}
+
+void marcaAciertos(int *tabla, int aleatorio, int *aciertos_carton) {
+    if (is_number_in_array(tabla, aleatorio)) {
+        tabla[aleatorio] = ASCII_FOUND_MARK;
+    }
+	count_found(tabla, aciertos_carton);
+}
+
+void gen_x_game_numbers(int tabla[], int x, int player1[], int player2[]) {
+    int entero;
 	int counter_player1 = 0;
 	int counter_player2 = 0;
 
     while (x > 0) {
         
-        generaNumerosAleatorios(game_array, &random_number);
+        generaNumerosAleatorios(tabla, &entero);
         
-        change_if_found(player1, random_number);
-        change_if_found(player2, random_number);
+        marcaAciertos(player1, entero, &counter_player1);
+        marcaAciertos(player2, entero, &counter_player2);
         
-        printf("Ha salido el numero: %d\n", random_number);
+        printf("Ha salido el numero: %d\n", entero);
         imprimeCarton(player1);
         imprimeCarton(player2);
 	
         x--;
         sleep(TIME_TO_SLEEP);
         system("clear");
-		count_found(player1, &counter_player1);
-		count_found(player2, &counter_player2);
 		if (counter_player1 == ARRAY_SIZE / 5 || counter_player2 == ARRAY_SIZE / 5)
 			return ;
     }
@@ -114,9 +115,9 @@ int main()
     int counter_player1 = 0;
 	int counter_player2 = 0;
 
-    inicializaMenosUno(player1);
-    inicializaMenosUno(player2);
-    inicializaMenosUno(game);
+    inicializaMenosUno(ARRAY_SIZE, player1);
+    inicializaMenosUno(ARRAY_SIZE, player2);
+    inicializaMenosUno(ARRAY_SIZE, game);
     
     generaCarton(player1);
     generaCarton(player2);
